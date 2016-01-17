@@ -28,8 +28,18 @@ XEP-0363 CLI upload tool
 
 ## Usage
 
-    $ ./uploadr.py
-    usage: uploadr.py [-h] -j JID -p PASSWORD filename
+    $ ./uploadr.py -h
+    usage: uploadr.py [-h] [-j JID] [-p PASSWORD] [-s] filename
+
+    positional arguments:
+      filename              File to upload
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -j JID, --jid JID     JID
+      -p PASSWORD, --password PASSWORD
+                            Password
+      -s, --short           Use https://yerl.org to shorten URL
 
 You can put your credentials into ~/.uploadrc
 
