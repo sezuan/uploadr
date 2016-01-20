@@ -6,6 +6,7 @@ import sys
 import logging
 import requests
 import argparse
+import tempfile
 
 from sleekxmpp import ClientXMPP
 from sleekxmpp.exceptions import IqError, IqTimeout, XMPPError
@@ -24,6 +25,14 @@ class Uploadr(ClientXMPP):
         self.filename = filename
         self.shorten_url = shorten_url
 
+    def process_txt_stdin(self):
+        data = sys.stdin.read(20*1024*1024)
+        try:
+            data.decode("UTF-8")
+        except:
+            return False
+        return data
+
 
     def session_start(self, event):
         self.send_presence()
@@ -32,7 +41,18 @@ class Uploadr(ClientXMPP):
         # Upload File
 
         try:
-            get_url = self['xep_0363'].upload_file(self.filename)
+            if self.filename == '-':
+                text = self.process_txt_stdin()
+                if not text:
+                    print "I don't upload binary data from STDIN!"
+                    self.disconnect()
+                    return
+                fh = tempfile.NamedTemporaryFile(suffix='.txt', prefix='uploadr-')
+                fh.write(text)
+                fh.flush()
+                get_url = self['xep_0363'].upload_file(fh.name)
+            else:
+                get_url = self['xep_0363'].upload_file(self.filename)
             if self.shorten_url:
                 print self.short(get_url)
             else:
@@ -84,7 +104,7 @@ if __name__ == '__main__':
     parser.add_argument("-j", "--jid", help="JID", required=not(jid))
     parser.add_argument("-p", "--password", help="Password", required=not(password))
     parser.add_argument("-s", "--short", help="Use https://yerl.org to shorten URL", action="store_true", required=False, )
-    parser.add_argument("filename", help="File to upload")
+    parser.add_argument("filename", nargs='?', default='-', help="File to upload")
     args = parser.parse_args()
 
     if args.jid:
