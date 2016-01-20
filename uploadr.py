@@ -93,5 +93,8 @@ if __name__ == '__main__':
         password = args.password
 
     xmpp = Uploadr(jid, password, args.filename, args.short)
-    xmpp.connect()
-    xmpp.process(block=True)
+    try:
+        xmpp.connect()
+        xmpp.process(block=True)
+    except KeyboardInterrupt:
+        pass
