@@ -40,6 +40,8 @@ XEP-0363 CLI upload tool
       -p PASSWORD, --password PASSWORD
                             Password
       -s, --short           Use https://yerl.org to shorten URL
+      -n NOTIFY, --notify NOTIFY
+                            Send a notification.
 
 You can put your credentials into ~/.uploadrc
 
@@ -49,3 +51,7 @@ You can put your credentials into ~/.uploadrc
     EOF
     chmod 400 ~/.uploadrc
 
+
+## Example
+
+    $ ./upload.py --notify me@faraway.org burglar_cam_0001.jpg
