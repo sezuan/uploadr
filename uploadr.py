@@ -25,6 +25,7 @@ class Uploadr(ClientXMPP):
         ClientXMPP.__init__(self, jid, password)
         self.add_event_handler("session_start", self.session_start)
         self.register_plugin('xep_0030') # Service Discovery
+        self.register_plugin("xep_0066") # OOB
         self.register_plugin("xep_0363") # HTTP File Upload
         self.filename = filename
         self.shorten_url = shorten_url
@@ -54,7 +55,12 @@ class Uploadr(ClientXMPP):
             if self.notify:
                 if self.good_recipient(self.notify):
                     get_url = self['xep_0363'].upload_file(self.filename)
-                    self.send_message(mto=self.notify, mbody=get_url, mtype="chat")
+                    m = self.Message()
+                    m['to'] = self.notify
+                    m['type'] = 'chat'
+                    m['body'] = get_url
+                    m['oob']['url'] = get_url
+                    m.send()
                 else:
                     raise InvalidRecipient
             else:
